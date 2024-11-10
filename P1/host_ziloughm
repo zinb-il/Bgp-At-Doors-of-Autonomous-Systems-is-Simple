@@ -1,0 +1,17 @@
+# Image de base Alpine
+FROM alpine:latest
+
+# Installation des outils de base
+# Pour la configuration réseau (VXLAN) : iproute2
+# Pour l'analyse du trafic réseau : tcpdump
+# Pour tester la connectivité et l’utilisation des outils comme ping :iputils
+RUN apk add --no-cache iproute2 \
+    tcpdump \ 
+    iputils \      
+    bash
+
+# Configuration pour GNS3
+# Pour garder la PERSISTANCE des données même si le conteneur redémarre, on crée des volume dans la structure de projets de GNS3
+VOLUME ["/root"]
+
+CMD ["/bin/bash"]
