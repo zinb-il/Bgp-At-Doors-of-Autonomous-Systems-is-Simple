@@ -5,7 +5,7 @@ FROM alpine:latest
 # Pour la configuration réseau (VXLAN) : iproute2
 # Pour l'analyse du trafic réseau : tcpdump
 # Pour tester la connectivité et l’utilisation des outils comme ping :iputils
-RUN apk add --no-cache iproute2 \
+RUN apk update && apk upgrade && apk add --no-cache iproute2 \
     tcpdump \ 
     iputils \      
     bash
