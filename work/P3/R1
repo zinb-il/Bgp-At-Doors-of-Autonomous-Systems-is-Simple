@@ -1,0 +1,59 @@
+## router-1 (spine) 
+
+
+```
+bash
+vtysh
+```
+
+```
+conf t
+hostname _irhesri-1
+!Disables IPv6 routing, meaning the router won't forward IPv6 traffic.
+no ipv6 forwarding
+
+! Interfaces Configuration 
+interface eth0
+ip address 10.1.1.1/30
+
+interface eth1
+ip address 10.1.1.5/30
+
+interface eth2
+ip address 10.1.1.9/30
+
+! Configuring the loopback interface, which is used for internal communication.
+interface lo
+ip address 1.1.1.1/32
+
+! Starts configuring BGP with AS number 1
+router bgp 1
+! Defines a peer group named "ibgp" to simplify configuration of multiple BGP neighbors.
+neighbor ibgp peer-group
+! Specifies that the BGP neighbors in the "ibgp" peer group are in AS 1, the same as this router.
+neighbor ibgp remote-as 1
+! Uses the loopback interface as the source for BGP updates
+neighbor ibgp update-source lo
+! Configures the router to listen for BGP updates from any IP in the range 1.1.1.0/24 and treat them as part of the "ibgp" peer group.
+bgp listen range 1.1.1.0/24 peer-group ibgp
+
+! Enables EVPN (Ethernet VPN) support
+address-family l2vpn evpn
+! Activates EVPN on the "ibgp" neighbor.
+neighbor ibgp activate
+! Configures this router as a route reflector for the "ibgp" neighbor
+neighbor ibgp route-reflector-client
+exit-address-family
+
+! Starts configuring OSPF 
+router ospf
+! Enable routing process OSPF on all IP networks on area 0
+network 0.0.0.0/0 area 0
+line vty
+```
+
+
+
+
+
+

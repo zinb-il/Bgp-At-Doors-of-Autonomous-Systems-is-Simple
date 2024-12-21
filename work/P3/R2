@@ -1,0 +1,51 @@
+
+## router-2 (leaf) 
+
+```
+bash
+
+! Create a virtual network bridge named br0.
+ip link add br0 type bridge
+! Activate br0.
+ip link set dev br0 up
+! Create a VXLAN interface (vxlan10) with a VXLAN ID of 10 and specifies the destination UDP port as 4789.
+ip link add vxlan10 type vxlan id 10 dstport 4789
+! Activate the vxlan10 interface.
+ip link set dev vxlan10 up
+
+! Add the vxlan10 interface to the br0 bridge, allowing VXLAN traffic to flow through the bridge.
+brctl addif br0 vxlan10
+brctl addif br0 eth1
+
+vtysh
+```
+
+```
+conf t
+hostname _irhesri-2
+no ipv6 forwarding
+
+interface eth0
+ip address 10.1.1.2/30
+ip ospf area 0
+
+interface lo
+ip address 1.1.1.2/32
+! Enable OSPF on lo interface
+ip ospf area 0
+
+! Configure a routing process BGP with AS number 1
+router bgp 1
+! Defines a BGP neighbor with the IP address 1.1.1.1 and specifies that the neighbor is in AS 1
+neighbor 1.1.1.1 remote-as 1
+! Tell BGP to use the loopback interface (lo, IP 1.1.1.2) as the source for BGP updates. 
+neighbor 1.1.1.1 update-source lo
+! Enable the Address Family for neighbor 1.1.1.1 and advertise all local VNIs
+address-family l2vpn evpn
+! Activates the EVPN address family for the BGP neighbor (1.1.1.1)
+neighbor 1.1.1.1 activate
+advertise-all-vni
+exit-address-family
+
+router ospf
+```
